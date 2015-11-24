@@ -125,4 +125,12 @@ sapply(strsplit(colnames(get.adjacency(g)), " "), "[", 2)
 colnames(get.adjacency(g))[189]
 date <- as.numeric(sapply(strsplit(colnames(get.adjacency(g)), " "), function(x){x[length(x)]}))
 date
-plot(g, layout = matrix(runif(198*2), ncol = 2), vertex.label = NA, vertex.color = date)
+
+plot(g, layout = layout.fruchterman.reingold, vertex.label = NA, vertex.color = date)
+
+
+citLinks <- data.frame(el3)
+citNodes <- data.frame(nodeID = colnames(get.adjacency(g)), date = date)
+list1 <- lapply(split(citLinks, factor(citLinks$paper)), "[", 2)
+
+forceNetwork(citLinks, citNodes, Source = "paper", Target = "citing", NodeID = "nodeID", Group = "date")
