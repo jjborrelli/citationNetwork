@@ -116,3 +116,13 @@ el3 <- el2[el2[,"citing"] %in% t3$citing,]
 g <- graph.edgelist(el3)
 plot(g, layout = matrix(runif(198*2), ncol = 2), vertex.label = NA)
 degree(g)
+
+
+colnames(get.adjacency(g))
+date <- as.numeric(sapply(strsplit(colnames(get.adjacency(g)), " "), "[", 2))
+date
+sapply(strsplit(colnames(get.adjacency(g)), " "), "[", 2)
+colnames(get.adjacency(g))[189]
+date <- as.numeric(sapply(strsplit(colnames(get.adjacency(g)), " "), function(x){x[length(x)]}))
+date
+plot(g, layout = matrix(runif(198*2), ncol = 2), vertex.label = NA, vertex.color = date)
