@@ -1,3 +1,18 @@
+# Download Web of Science Marked List with the following boxes checked: 
+## Authors
+## ISSN
+## Title
+## Cited references
+## Cited Reference Count
+## Accession Number
+## Source
+## Keywords
+## Source Abbrev
+## Author Identifiers
+## Publisher Info
+## Page Count
+
+
 file.name <- "C:/Users/jjborrelli/Downloads/savedrecs (3).txt"
 file.name <- "C:/Users/jjborrelli/Desktop/GitHub/citationNetwork/AG1989_refs.txt"
 data <- readLines(file.name)
