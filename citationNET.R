@@ -1,4 +1,5 @@
 file.name <- "C:/Users/jjborrelli/Downloads/savedrecs (3).txt"
+file.name <- "C:/Users/jjborrelli/Desktop/GitHub/citationNetwork/AG1989_refs.txt"
 data <- readLines(file.name)
 
 authors <- function(data){
@@ -19,7 +20,7 @@ authors <- function(data){
   allAU <- sapply(allAU, function(x){
     if(length(x) > 1){
       #x <- paste(x[1], "et. al")
-      x <- x[1]
+      x <-  x[1]
     }else{x}
   })
   
@@ -79,9 +80,11 @@ citingREFs <- function(data){
     #only get citing references with data for au, yr, and jrn
     spt <- spt[sapply(spt, length) >= 3]
     
-    aus <- tolower(sapply(spt, function(x){strsplit(x, " ")[[1]][1]}))
-    aus <- paste(toupper(substr(aus, 1, 1)), substr(aus, 2, nchar(aus)), sep="")
+    #aus <- tolower(sapply(spt, function(x){strsplit(x, " ")[[1]][1]}))
+    #aus <- paste(toupper(substr(aus, 1, 1)), substr(aus, 2, nchar(aus)), sep="")
+    aus <- toupper(sapply(spt, function(x){strsplit(x, " ")[[1]][1]}))
    
+    
     yrs <- sapply(spt, "[[", 2)
     
     jrn <- sapply(spt, "[[", 3)
@@ -94,9 +97,8 @@ citingREFs <- function(data){
 
 
 
-papers <- matrix(c(authors(data), publi(data), titles(data)), ncol = 4)
-
 papers <- matrix(c(authors(data), years(data)), ncol = 2)
+papers[,1] <- toupper(papers[,1])
 
 crefs <- citingREFs(data) 
 
@@ -110,27 +112,57 @@ library(plyr)
 test <- lapply(crefs, function(x) apply(x[,1:2], 1, paste, collapse = " "))
 df <- data.frame(a = do.call("c", test))
 t2 <- ddply(data.frame(el2), .(citing) ,nrow)
-t3 <- t2[t2$V1 > 5,]
+t3 <- t2[t2$V1 > 10,]
 
 el3 <- el2[el2[,"citing"] %in% t3$citing,]
-g <- graph.edgelist(el3)
-plot(g, layout = matrix(runif(198*2), ncol = 2), vertex.label = NA)
+g <- graph.edgelist(unique(el3))
+plot(g, layout = matrix(runif(1092*2), ncol = 2), vertex.label = NA, vertex.size = 2, edge.arrow.size = .5)
 degree(g)
 
 
-colnames(get.adjacency(g))
-date <- as.numeric(sapply(strsplit(colnames(get.adjacency(g)), " "), "[", 2))
-date
-sapply(strsplit(colnames(get.adjacency(g)), " "), "[", 2)
-colnames(get.adjacency(g))[189]
+colnames(get.adjacency(g)) == "ARDITI 1989"
+
 date <- as.numeric(sapply(strsplit(colnames(get.adjacency(g)), " "), function(x){x[length(x)]}))
 date
 
-plot(g, layout = layout.fruchterman.reingold, vertex.label = NA, vertex.color = date)
+paperDATE <- as.numeric(t(sapply(strsplit(el3[,1], " "), function(x){x[length(x)]})))
+citingDATE <- as.numeric(sapply(strsplit(el3[,2], " "), function(x){x[length(x)]}))
 
 
-citLinks <- data.frame(el3)
-citNodes <- data.frame(nodeID = colnames(get.adjacency(g)), date = date)
-list1 <- lapply(split(citLinks, factor(citLinks$paper)), "[", 2)
 
-forceNetwork(citLinks, citNodes, Source = "paper", Target = "citing", NodeID = "nodeID", Group = "date")
+allyrs <- seq(1990, 2015, 1) 
+
+g.list <- list()
+for(i in 1:length(allyrs)){
+  g.list[[i]] <- graph.edgelist(unique(el3[paperDATE <= allyrs[i],]))
+}
+
+n.nodes <- sapply(g.list, function(x){length(V(x))})
+plot(n.nodes~allyrs)
+n.edges <- sapply(g.list, function(x){length(E(x))})
+plot(n.edges~allyrs)
+
+library(rnetcarto)
+conversion <- function(tm){
+  for(i in 1:nrow(tm)){
+    for(j in 1:ncol(tm)){
+      if(tm[i,j] == 1){tm[j,i] <- -1}
+    }
+  }
+  return(tm)
+}
+g.list.con <- lapply(lapply(lapply(g.list, get.adjacency, sparse = F), conversion), graph.adjacency)
+mod.all <- lapply(lapply(g.list, get.adjacency, sparse = F), netcarto)
+mod.all2 <- lapply(lapply(g.list.con, get.adjacency, sparse = F), netcarto)
+
+n.mods <- sapply(mod.all, function(x) max(x[[1]]$module))
+n.mods2 <- sapply(mod.all2, function(x) max(x[[1]]$module))
+
+mods <- sapply(mod.all, "[[", 2)
+mods2 <- sapply(mod.all2, "[[", 2)
+
+plot(mods~allyrs)
+
+y = 2
+plot(g.list[[y]], vertex.color = mod.all2[[y]][[1]]$module, vertex.label.cex = .7, vertex.size = 7)
+ 
