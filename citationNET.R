@@ -163,6 +163,10 @@ mods2 <- sapply(mod.all2, "[[", 2)
 
 plot(mods~allyrs)
 
-y = 2
-plot(g.list[[y]], vertex.color = mod.all2[[y]][[1]]$module, vertex.label.cex = .7, vertex.size = 7)
+y = 25
+lay <- matrix(ncol =2, nrow = n.nodes[25])
+lay[mod.all2[[25]][[1]]$module == 0,] <- cbind(runif(sum(mod.all2[[25]][[1]]$module == 0), -.5, .5), runif(sum(mod.all2[[25]][[1]]$module == 0), .5, 1))
+lay[mod.all2[[25]][[1]]$module == 1,] <- cbind(runif(sum(mod.all2[[25]][[1]]$module == 1), -1, -.2), runif(sum(mod.all2[[25]][[1]]$module == 1), -.5, 0))
+lay[mod.all2[[25]][[1]]$module == 2,] <- cbind(runif(sum(mod.all2[[25]][[1]]$module == 2), .2, 1), runif(sum(mod.all2[[25]][[1]]$module == 2), -.5, 0))
+plot(g.list[[y]], layout = lay, vertex.color = mod.all2[[y]][[1]]$module, vertex.label = NA, vertex.label.cex = .7, vertex.size = 3, edge.arrow.size = .5, edge.width = .05)
  
