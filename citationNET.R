@@ -185,3 +185,8 @@ lay[mod.all2[[25]][[1]]$module == 1,] <- cbind(runif(sum(mod.all2[[25]][[1]]$mod
 lay[mod.all2[[25]][[1]]$module == 2,] <- cbind(runif(sum(mod.all2[[25]][[1]]$module == 2), .2, 1), runif(sum(mod.all2[[25]][[1]]$module == 2), -.5, 0))
 plot(g.list[[y]], layout = lay, vertex.color = mod.all2[[y]][[1]]$module, vertex.label = NA, vertex.label.cex = .7, vertex.size = 3, edge.arrow.size = .5, edge.width = .05)
  
+
+
+lapply(lapply(mod.all2, "[[", 1), function(q){q$name[aggregate(q$connectivity, list(q$module), which.max)$x]})
+
+
